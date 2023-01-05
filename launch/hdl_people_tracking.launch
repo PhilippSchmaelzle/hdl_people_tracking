@@ -9,10 +9,10 @@
 
   <node pkg="nodelet" type="nodelet" name="hdl_people_detection_nodelet" args="load hdl_people_tracking/HdlPeopleDetectionNodelet $(arg nodelet_manager)">
     <param name="static_sensor" value="false"/>
-    <param name="downsample_resolution" value="0.1"/>
+    <param name="downsample_resolution" value="0.2"/>
     <!-- back subtraction params -->
-    <param name="backsub_resolution" value="0.2"/>
-    <param name="backsub_occupancy_thresh" value="2"/>
+    <param name="backsub_resolution" value="0.5"/>
+    <param name="backsub_occupancy_thresh" value="1"/>
     <!-- clustering params -->
     <param name="cluster_min_pts" value="10"/>
     <param name="cluster_max_pts" value="2048"/>
