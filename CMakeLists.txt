@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(hdl_people_tracking)
 
 # -mavx causes a lot of errors!!
-add_definitions(-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
-set(CMAKE_CXX_FLAGS "-std=c++11 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
+add_definitions(-std=c++14 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
+set(CMAKE_CXX_FLAGS "-std=c++14 -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # pcl 1.7 causes a segfault when it is built with debug mode
@@ -17,6 +17,10 @@ find_package(Qt5Widgets)
 find_package(Qt5Test)
 find_package(Qt5Concurrent)
 find_package(Qt5OpenGL)
+find_package(OpenCV 4 REQUIRED)
+
+find_package(catkin_simple)
+catkin_simple()
 
 find_package(catkin REQUIRED COMPONENTS
   nodelet
@@ -29,14 +33,14 @@ find_package(catkin REQUIRED COMPONENTS
 ########################
 ## message generation ##
 ########################
-add_message_files(FILES
-  Cluster.msg
-  ClusterArray.msg
-  Track.msg
-  TrackArray.msg
-)
-
-generate_messages(DEPENDENCIES std_msgs geometry_msgs)
+#add_message_files(FILES
+#  Cluster.msg
+#  ClusterArray.msg
+#  Track.msg
+#  TrackArray.msg
+#)
+#
+#generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 
 
 ###################################
@@ -58,10 +62,11 @@ include_directories(
 )
 
 
-add_library(hdl_people_detection_nodelet
+cs_add_library(hdl_people_detection_nodelet
   apps/hdl_people_detection_nodelet.cpp
   src/kidono_human_classifier.cpp
   src/people_detector.cpp
+  apps/hdl_people_tracking_nodelet.cpp
 )
 target_link_libraries(hdl_people_detection_nodelet
   ${catkin_LIBRARIES}
@@ -70,10 +75,27 @@ target_link_libraries(hdl_people_detection_nodelet
 )
 add_dependencies(hdl_people_detection_nodelet hdl_people_tracking_gencpp)
 
-add_library(hdl_people_tracking_nodelet apps/hdl_people_tracking_nodelet.cpp)
-target_link_libraries(hdl_people_tracking_nodelet
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-  ${PCL_LIBRARIES}
+#cs_add_library(hdl_people_tracking_nodelet apps/hdl_people_tracking_nodelet.cpp)
+#target_link_libraries(hdl_people_tracking_nodelet
+#  ${catkin_LIBRARIES}
+#  ${OpenCV_LIBRARIES}
+#  ${PCL_LIBRARIES}
+#)
+#add_dependencies(hdl_people_tracking_nodelet hdl_people_tracking_gencpp)
+
+install(DIRECTORY launch/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+        )
+install(DIRECTORY data/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/data
+        )
+
+install(
+        FILES nodelet_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-add_dependencies(hdl_people_tracking_nodelet hdl_people_tracking_gencpp)
+
+
+cs_install()
+
+cs_export(DEPENDS OpenCV)
